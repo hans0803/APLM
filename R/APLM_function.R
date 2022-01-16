@@ -47,3 +47,18 @@ yget <- function(data, beta, e=rnorm(dim(data)[1]), way=1){
   y <- mat%*%beta+e
   return(y)
 }
+
+glt <- function(model1, model2, alpha=0.05){
+  l1 <- length(model1$coefficients)
+  l2 <- length(model1$coefficients)
+  sse1 <- sum((model1$residuals)^2)
+  sse2 <- sum((model2$residuals)^2)
+  df1 <- model1$df.residual
+  df2 <- model2$df.residual
+  ans <- ((sse1-sse2)/(l1-l2))/(sse2/df2) > qf(1-alpha,2,df2)
+  if(ans){
+    print("model1 is better")
+  }else{
+    print("model2 is better")
+  }
+}

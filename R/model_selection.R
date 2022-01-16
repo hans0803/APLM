@@ -304,7 +304,7 @@ aselect <- function(y, data){
 
   }
 
-  # return the minimal aic value parameter's model names
+  # return the minimal aic value model
   fit <- lm(y ~ ., df_list[[which(aic==min(aic))]])
   return(fit)
 }
