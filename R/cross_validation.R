@@ -1,4 +1,5 @@
 hcv <- function(data, seed, prop=0.2) {
+  set.seed(seed)
   datasize <- dim(data)[1]
   cvlist <- list(NULL)
   cvlist[[2]] <- sort(sample(1:datasize, ceiling(datasize*prop), replace=F))
@@ -14,6 +15,7 @@ loocv <- function(data) {
 }
 
 kfcv <- function(data, seed, k=5) {
+  set.seed(seed)
   datasize <- dim(data)[1]
   cvlist <- list(NULL)
   n <- rep(1:k, ceiling(datasize/k))[1:datasize]
