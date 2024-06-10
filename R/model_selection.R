@@ -40,8 +40,13 @@ fselect <- function(y, data, alpha_in=0.01, alpha_out=0.05, mode="forward", earl
         note <- data.frame(name=C_names, F_value=F_value, P_value=P_value)
         # Find whos F-value is biggest and take it P-value
         max_F <- max(note$F_value)
-        max_Fvar <- which(note$F_value==max_F)
+        if(length(max_F)>1){
+          max_Fvar <- which(note$F_value==max_F)[1]
+        }else{
+          max_Fvar <- which(note$F_value==max_F)
+        }
         alpha_test <- as.numeric(note$P_value[max_Fvar])
+        
       }
       
       # if it pass the check, add in and drop out
@@ -108,7 +113,11 @@ fselect <- function(y, data, alpha_in=0.01, alpha_out=0.05, mode="forward", earl
         forward_note <- data.frame(name=C_names, F_value=F_value, P_value=P_value)
         # Find whos F-value is smallest and take it P-value
         min_F <- min(forward_note$F_value)
-        min_Fvar <- which(forward_note$F_value==min_F)
+        if(length(min_F)>1){
+          min_Fvar <- which(forward_note$F_value==min_F)[1]
+        }else{
+          min_Fvar <- which(forward_note$F_value==min_F)
+        }
         alpha_test <- as.numeric(forward_note$P_value[min_Fvar])
         
         if(alpha_test > alpha_out){
@@ -217,6 +226,18 @@ fselect <- function(y, data, alpha_in=0.01, alpha_out=0.05, mode="forward", earl
       cat('in:', in_width, '/ out:', out_width, ':', who_catch, '(OUT) \n')
       who_out <- who_catch
       
+      if(who_in==who_out | in_width){
+        break_count <- break_count + 1
+        print(break_count)
+      }else{
+        break_count <- 0
+      }
+      if(break_count > early_break_count){
+        message_var <- paste("Break warning by variable in=out")
+        warning(message_var)
+        break
+      }
+      
       # stepwise part start
       # check df_out variable > 1
       if(out_width > 1){
@@ -264,17 +285,6 @@ fselect <- function(y, data, alpha_in=0.01, alpha_out=0.05, mode="forward", earl
       }
       cat('in:', in_width, '/ out:', out_width, ':', who_catch, '(IN) \n')
       who_in <- who_catch
-      
-      if(who_in==who_out){
-        break_count <- break_count + 1
-      }else{
-        break_count <- 0
-      }
-      if(break_count > early_break_count){
-        message_var <- paste("Break warning by variable in=out")
-        warning(message_var)
-        break
-      }
       
       # stepwise part end
       
