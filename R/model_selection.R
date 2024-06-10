@@ -217,17 +217,6 @@ fselect <- function(y, data, alpha_in=0.01, alpha_out=0.05, mode="forward", earl
       cat('in:', in_width, '/ out:', out_width, ':', who_catch, '(OUT) \n')
       who_out <- who_catch
       
-      if(who_in==who_out){
-        break_count <- break_count + 1
-      }else{
-        break_count <- 0
-      }
-      if(break_count > early_break_count){
-        message_var <- paste("Break warning by variable in=out")
-        warning(message_var)
-        break
-      }
-      
       # stepwise part start
       # check df_out variable > 1
       if(out_width > 1){
@@ -276,6 +265,17 @@ fselect <- function(y, data, alpha_in=0.01, alpha_out=0.05, mode="forward", earl
       cat('in:', in_width, '/ out:', out_width, ':', who_catch, '(IN) \n')
       who_in <- who_catch
       
+      if(who_in==who_out){
+        break_count <- break_count + 1
+      }else{
+        break_count <- 0
+      }
+      if(break_count > early_break_count){
+        message_var <- paste("Break warning by variable in=out")
+        warning(message_var)
+        break
+      }
+      
       # stepwise part end
       
       # if no any variable in df_out, stop loop
@@ -302,61 +302,5 @@ fselect <- function(y, data, alpha_in=0.01, alpha_out=0.05, mode="forward", earl
     }
     
   }
-  return(fit)
-}
-
-aselect <- function(y, data){
-
-  # save x names
-  x_name <- colnames(data)
-  # create empty list sub to save every combn x
-  sub <- list(NULL)
-  # create empty list sub_name to save every combn x_name
-  sub_name <- list(NULL)
-  # save total combination of every x type
-  num <- c(NULL)
-
-  # do col of x times loop to combn x, x_name and save num
-  for(i in 1:dim(data)[2]){
-
-    sub[[i]] <- combn(data, i)
-    sub_name[[i]] <- combn(x_name, i)
-    num[i] <- dim(sub[[i]])[2]
-
-  }
-
-  # unlist sub_name to vector
-  sub_name <- unlist(sub_name)
-  # define k to count the list size
-  k <- 1
-  # create empty list sub to save combination of x
-  df_list <- list(NULL)
-
-  for(i in 1:dim(data)[2]){ # x col loop
-    for(j in 1:num[i]){ # x type loop
-
-      df_list[[k]] <- as.data.frame(sub[[i]][,j]) # list->data.frame, it will use in lm
-      para_length <- length(colnames(df_list[[k]])) # get ? para in this data.frame
-      colnames(df_list[[k]]) <- sub_name[1:para_length] # gave para name from sub_name
-      sub_name <- sub_name[-1:-para_length] # delete used name
-      k <- k+1
-
-    }
-  }
-
-  # create empty vector to save aic value
-  aic <- c(NULL)
-  # do data.frame size loop by Baska triangle
-  total <- 2**dim(data)[2]-1
-
-  for(i in 1:total){
-
-    df <- as.data.frame(cbind(y, df_list[[i]])) # cbind y and x
-    aic[i] <- AIC(lm(df[,1] ~ ., as.data.frame(df[,-1]))) # do aic and save it
-
-  }
-
-  # return the minimal aic value model
-  fit <- lm(y ~ ., df_list[[which(aic==min(aic))]])
   return(fit)
 }
